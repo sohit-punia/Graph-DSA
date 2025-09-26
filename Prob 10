@@ -1,0 +1,46 @@
+Directed Graph Cycle (dfs)
+
+class Solution {
+private:
+    bool dfsCheck(int node,
+                  vector<vector<int>>& adj,
+                  vector<int>& vis,
+                  vector<int>& pathVis) {
+
+        vis[node] = 1;
+        pathVis[node] = 1;
+
+        for (int it : adj[node]) {
+            if (!vis[it]) {
+                if (dfsCheck(it, adj, vis, pathVis))
+                    return true;
+            } 
+            else if (pathVis[it]) {
+                return true; // back edge → cycle
+            }
+        }
+
+        pathVis[node] = 0; // backtrack
+        return false;
+    }
+
+public:
+    // edges[i] = {u, v}
+    bool isCyclic(int V, vector<vector<int>>& edges) {
+        // Step 1: Convert edge list to adjacency list
+        vector<vector<int>> adj(V);
+        for (auto &e : edges) {
+            adj[e[0]].push_back(e[1]);
+        }
+
+        // Step 2: Detect cycle with DFS
+        vector<int> vis(V, 0), pathVis(V, 0);
+        for (int i = 0; i < V; i++) {
+            if (!vis[i]) {
+                if (dfsCheck(i, adj, vis, pathVis))
+                    return true;
+            }
+        }
+        return false;
+    }
+};
