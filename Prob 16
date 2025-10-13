@@ -1,0 +1,35 @@
+802. Find Eventual Safe States
+
+vector<int> eventualSafeNodes(vector<vector<int>>& graph) {
+        int V = graph.size();
+        vector<vector<int>> revGraph(V);
+        vector<int> outdeg(V, 0);
+
+        // Step 1: Reverse the graph & count original outdegree
+        for(int i = 0; i < V; i++){
+            for(int v : graph[i]){
+                revGraph[v].push_back(i); // reverse edge
+                outdeg[i]++;              // original outdegree
+            }
+        }
+        // Step 2: Push all terminal nodes (outdegree == 0) into queue
+        queue<int> q;
+        for(int i = 0; i < V; i++){
+            if (outdeg[i] == 0) q.push(i);
+        }
+        // Step 3: Topological process (like Kahn’s)
+        vector<int> safe;
+        while(!q.empty()){
+            int node = q.front(); q.pop();
+            safe.push_back(node);
+            for (int prev : revGraph[node]) {
+                outdeg[prev]--;
+                if (outdeg[prev] == 0) {
+                    q.push(prev);
+                }
+            }
+        }
+        // Step 4: Sort the result
+        sort(safe.begin(), safe.end());
+        return safe;
+    }
