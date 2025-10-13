@@ -1,0 +1,60 @@
+Alien Dictionary
+
+
+    int N = words.size();
+
+    // Step 1: Build graph
+    vector<vector<int>> adj(26);
+    vector<int> indegree(26, 0);
+    vector<int> used(26, 0);
+
+    // Mark used characters
+    for (auto &w : words) {
+        for (char c : w) used[c - 'a'] = 1;
+    }
+
+    // Step 2: Build edges from first differing character
+    for (int i = 0; i < N - 1; i++) {
+        string s1 = words[i];
+        string s2 = words[i + 1];
+        int len = min((int)s1.size(), (int)s2.size());
+
+        int ptr = 0;
+        while (ptr < len && s1[ptr] == s2[ptr]) ptr++;
+
+        // Invalid case: s1 is longer but s2 is prefix
+        if (ptr == len && s1.size() > s2.size()) return "";
+
+        if (ptr < len) {
+            int u = s1[ptr] - 'a';
+            int v = s2[ptr] - 'a';
+            adj[u].push_back(v);
+            indegree[v]++;
+        }
+    }
+
+    // Step 3: Kahn’s Algorithm
+    queue<int> q;
+    for (int i = 0; i < 26; i++) {
+        if (used[i] && indegree[i] == 0) q.push(i);
+    }
+
+    string ans = "";
+    while (!q.empty()) {
+        int node = q.front();
+        q.pop();
+        ans += (char)(node + 'a');
+
+        for (auto it : adj[node]) {
+            indegree[it]--;
+            if (indegree[it] == 0) q.push(it);
+        }
+    }
+
+    // Step 4: Check if topological sort covered all used letters
+    int usedCount = 0;
+    for (int i = 0; i < 26; i++) if (used[i]) usedCount++;
+    if (ans.size() != usedCount) return "";  // cycle detected
+
+    return ans;
+}
