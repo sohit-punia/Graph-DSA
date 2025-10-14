@@ -1,0 +1,29 @@
+Shortest Path in Undirected Graph (using BFS)
+
+vector<int> shortestPath(vector<vector<int>>& adj, int src) {
+    int V = adj.size();                      // number of vertices
+    vector<int> dist(V, 1e9);                // initially all distances are INF
+    queue<int> q;
+
+    dist[src] = 0;
+    q.push(src);
+
+    while (!q.empty()) {
+        int node = q.front();
+        q.pop();
+
+        for (auto it : adj[node]) {
+            if (dist[node] + 1 < dist[it]) {   // since unit weight
+                dist[it] = dist[node] + 1;
+                q.push(it);
+            }
+        }
+    }
+
+    // convert INF to -1 if unreachable
+    for (int i = 0; i < V; i++) {
+        if (dist[i] == (int)1e9) dist[i] = -1;
+    }
+
+    return dist;
+}
