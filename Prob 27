@@ -1,0 +1,44 @@
+1631. Path With Minimum Effort
+
+int minimumEffortPath(vector<vector<int>>& heights) {
+    int n = heights.size();
+    int m = heights[0].size();
+
+    // dist[r][c] = minimum effort needed to reach (r,c)
+    vector<vector<int>> dist(n, vector<int>(m, INT_MAX));
+
+    // min-heap: {effort_so_far, {row, col}}
+    using Node = pair<int, pair<int,int>>;
+    priority_queue<Node, vector<Node>, greater<Node>> pq;
+
+    dist[0][0] = 0;
+    pq.push({0, {0, 0}});
+
+    int dr[4] = {-1, 0, 1, 0};
+    int dc[4] = {0, 1, 0, -1};
+
+    while (!pq.empty()) {
+        auto [eff, rc] = pq.top(); pq.pop();
+        int r = rc.first, c = rc.second;
+
+        // Skip stale entries
+        if (eff != dist[r][c]) continue;
+
+        // Reached target — current effort is minimal by Dijkstra’s property
+        if (r == n - 1 && c == m - 1) return eff;
+
+        for (int k = 0; k < 4; ++k) {
+            int nr = r + dr[k], nc = c + dc[k];
+            if (nr < 0 || nc < 0 || nr >= n || nc >= m) continue;
+
+            int w  = abs(heights[r][c] - heights[nr][nc]); // edge cost
+            int ne = max(eff, w);                          // path effort
+
+            if (ne < dist[nr][nc]) {
+                dist[nr][nc] = ne;
+                pq.push({ne, {nr, nc}});
+            }
+        }
+    }
+    return 0; // grid is connected; this line is never practically reached
+}
