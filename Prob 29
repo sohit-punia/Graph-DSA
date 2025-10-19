@@ -1,0 +1,35 @@
+Minimum Multiplications to reach End
+
+    int minimumMultiplications(vector<int>& arr, int start, int end) {
+        // queue => {current_node, steps_taken}
+        queue<pair<int,int>> q;
+        q.push({start, 0});
+
+        // distance array of size 100000 (as per problem)
+        vector<int> dist(100000, 1e9);
+        dist[start] = 0;
+
+        int mod = 100000;
+
+        while (!q.empty()) {
+            int node = q.front().first;
+            int steps = q.front().second;
+            q.pop();
+
+            // If we've already reached the end
+            if (node == end) return steps;
+
+            for (auto it : arr) {
+                int num = (1LL * it * node) % mod; // use 1LL to avoid overflow
+
+                if (steps + 1 < dist[num]) {
+                    dist[num] = steps + 1;
+
+                    if (num == end) return steps + 1;
+
+                    q.push({num, steps + 1});
+                }
+            }
+        }
+        return -1; // unreachable
+    }
