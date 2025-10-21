@@ -1,0 +1,39 @@
+1334. Find the City With the Smallest Number of Neighbors at a Threshold Distance
+
+    int findTheCity(int n, vector<vector<int>>& edges, int distanceThreshold) {
+        const int INF = 1e9;
+
+        // Build distance matrix
+        vector<vector<int>> dist(n, vector<int>(n, INF));
+        for (int i = 0; i < n; ++i) dist[i][i] = 0;
+        for (auto &e : edges) {
+            int u = e[0], v = e[1], w = e[2];
+            dist[u][v] = min(dist[u][v], w);
+            dist[v][u] = min(dist[v][u], w);
+        }
+
+        // Floyd–Warshall
+        for (int k = 0; k < n; ++k) {
+            for (int i = 0; i < n; ++i) {
+                if (dist[i][k] == INF) continue;
+                for (int j = 0; j < n; ++j) {
+                    if (dist[k][j] == INF) continue;
+                    dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j]);
+                }
+            }
+        }
+
+        // Count reachable cities within threshold; pick smallest count, break ties by larger index
+        int bestCity = -1, bestCnt = INT_MAX;
+        for (int city = 0; city < n; ++city) {
+            int cnt = 0;
+            for (int j = 0; j < n; ++j) {
+                if (j != city && dist[city][j] <= distanceThreshold) ++cnt;
+            }
+            if (cnt < bestCnt || (cnt == bestCnt && city > bestCity)) {
+                bestCnt = cnt;
+                bestCity = city;
+            }
+        }
+        return bestCity;
+    }
