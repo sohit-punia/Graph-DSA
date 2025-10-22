@@ -1,0 +1,36 @@
+Minimum Spanning Tree by Prim’s Algorithm 
+
+
+    int spanningTree(int V, vector<vector<int>>& edges) {
+        // build ajd list
+         vector<vector<pair<int,int>>> adj(V);
+        for(auto &e: edges){
+            int u = e[0], v = e[1], w = e[2];
+            adj[u].push_back({v, w});
+            adj[v].push_back({u, w}); // undirected
+        }
+        // Prim's algorithm using min-heap: {weight, node}
+        vector<int> vis(V , 0);
+        priority_queue<pair<int,int>,
+                       vector<pair<int,int>>,
+                       greater<pair<int,int>>> pq;
+                       
+        pq.push({0, 0});
+        int sum = 0;
+        while(!pq.empty()){
+            auto it = pq.top(); pq.pop();
+            int wt = it.first, node = it.second;
+            
+            if(vis[node] == 1) continue;
+            vis[node] = 1;
+            sum += wt;
+            for(auto &edge : adj[node]){
+                int adjNode = edge.first;
+                int edgeW   = edge.second;
+                if (!vis[adjNode]) pq.push({edgeW, adjNode});
+            }
+            
+        }
+        return sum;
+        
+    }
