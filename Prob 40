@@ -1,0 +1,40 @@
+547. Number of Provinces By Disjoint Set 
+
+class DisjointSet {
+    vector<int> parent, sz;
+ public:
+   DisjointSet(int n) : parent(n), sz(n, 1) {
+        iota(parent.begin(), parent.end(), 0);
+    }
+    int findUPar(int x) {
+        if (parent[x] == x) return x;
+        return parent[x] = findUPar(parent[x]);
+    }
+    void unionBySize(int a, int b) {
+        a = findUPar(a); b = findUPar(b);
+        if (a == b) return;
+        if (sz[a] < sz[b]) swap(a, b);
+        parent[b] = a;
+        sz[a] += sz[b];
+    }
+};
+class Solution {
+public:
+    int findCircleNum(vector<vector<int>>& isConnected) {
+        int n = isConnected.size();
+        DisjointSet ds(n);
+
+        for(int i = 0; i< n; i++){
+            for(int j = i +1 ; j < n; j++){
+                if(isConnected[i][j] == 1){
+                  ds.unionBySize(i, j);  
+                }
+            }
+        }
+        int provinces = 0;
+        for (int i = 0; i < n; ++i) {
+            if (ds.findUPar(i) == i) provinces++;
+        }
+         return provinces;
+    }
+};
